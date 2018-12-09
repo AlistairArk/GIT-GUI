@@ -22,7 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 # Input
 HEADERS += window.h tabs.h
-SOURCES += globals.cc main.cc window.cc tabs.cc hello.cc
+SOURCES += globals.cc main.cc window.cc tabs.cc hello.cc Create_Config.cc
 
 # just link demo tabs
 # LIBS += scsfsa.o
