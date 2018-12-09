@@ -1,4 +1,5 @@
 #include <QWidget>
+#include <QLineEdit>
 
 class QPushButton;
 
@@ -8,6 +9,12 @@ class HelloWorldLabel : public QWidget{
   public:
     HelloWorldLabel();
 
+  private:
+    QLineEdit *lnEditEmail;
+    QLineEdit *lnEditUsername;
+    QPushButton *setConfig;
+    std::string myDirStr;
   private slots:
-    void on_pushButton_clicked();
+    void on_browse_clicked();
+    void on_setConfig_clicked();
 };
