@@ -7,19 +7,16 @@
 #include <QFileDialog>
 #include <window.h>
 #include <QWidget>
+#include "Create_Config.h"
 
 
-//#include "Create_Config_Repo.h"
+// namespace{
+// 	class HelloWorldLabel;
+// 	INSTALL_TAB(HelloWorldLabel, "Create/ Select");
+// }
+	INSTALL_TAB(HelloWorldLabel, "Create/ Select");
 
-
-namespace{
-
-class HelloWorldLabel : public QWidget{
-public:
-	HelloWorldLabel() : QWidget(){
-
-
-
+	HelloWorldLabel::HelloWorldLabel(){
 
 		QPushButton *browse = new QPushButton("&Select Directory", this);
 		QLineEdit *lnEditUsername = new QLineEdit;
@@ -40,20 +37,14 @@ public:
 		//connect browse button to fileDialog
 		//connect(browse,SIGNAL (clicked()),on_pushButton_clicked);
 		//connect(m_button, SIGNAL (released()),this, SLOT (handleButton()));
-    connect(browse, SIGNAL (released()),this, SLOT ());
+    connect(browse, SIGNAL (released()),this, SLOT (on_pushButton_clicked()));
 
 		//connect(browse, &QPushButton::clicked, this, &QTTest::OnClickedPushButton);
 
 
 	}
-	// void on_pushButton_clicked()
-	// {
-	//QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),"/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-	// }
 
-
-};
-
-INSTALL_TAB(HelloWorldLabel, "Create/ Select");
-
-}
+	void HelloWorldLabel::on_pushButton_clicked()
+	{
+		 QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),"/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	}
