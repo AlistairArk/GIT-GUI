@@ -1,0 +1,28 @@
+== 2811 CW3 material
+
+a qt application with multiple tabs.
+
+== prerequisites
+
+- qmake
+- qt >= 4.6
+
+on DEC10 machines, you need to enter
+
+$ module add qt
+
+to make these available temporarily. On your own machine you might get away
+with
+
+$ apt-get install qtbase5-dev
+
+the latter is permanent.
+
+== build
+
+$ ./configure
+$ make
+
+== run
+
+$ ./2811_gui

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# edit this file
+conffile=2811_gui.pro
+
+if [ -z `which qmake` ]; then
+	 echo FAILED: could not find qmake >&2
+	 echo try \"module add qt\" >&2
+	 echo or \"apt-get install qtbase5-dev\" >&2
+	 exit 1
+fi
+
+qmake -o Makefile $conffile
