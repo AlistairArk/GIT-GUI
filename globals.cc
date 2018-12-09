@@ -1,4 +1,4 @@
 #include "dispatch.h"
-#include "gitpp.h"
+#include "gitpp7.h"
 
 WidgetDispatcher myTabs;
