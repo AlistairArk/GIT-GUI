@@ -48,21 +48,26 @@
 	void HelloWorldLabel::on_setConfig_clicked()
 	{
 		//need to do input validation
-
+		//get text from user
 		QString username = lnEditUsername->text();
 		QString user_email = lnEditEmail->text();
+
 
 		GITPP::REPO r(myDirStr);
 		auto c=r.config();
 
 		//TODO :: stop this from crashig!
 		//maybe try settinig git config manually through command line first then try though the app?
+		//set user defined confi to repo config
+		//THIS PROBABLY DOESNT DO WHAT I THINK IT DOES
 		GITPP::CONFIG::ITEM email=c["user.email"] = user_email.toStdString();
 		GITPP::CONFIG::ITEM name=c["user.name"] = username.toStdString();
 
+		//update placeholders
 		lnEditEmail->setPlaceholderText(user_email);
 		lnEditUsername->setPlaceholderText(username);
 
+		//this will notify the user that changes have been mad successfully once this works properly
 		QMessageBox::question(
 				this,
 				tr("It's working!"),

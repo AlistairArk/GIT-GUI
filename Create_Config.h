@@ -13,7 +13,7 @@ class HelloWorldLabel : public QWidget{
     QLineEdit *lnEditEmail;
     QLineEdit *lnEditUsername;
     QPushButton *setConfig;
-    std::string myDirStr;
+    //std::string myDirStr;
   private slots:
     void on_browse_clicked();
     void on_setConfig_clicked();
