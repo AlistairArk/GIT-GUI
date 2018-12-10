@@ -13,8 +13,6 @@ SearchTab::SearchTab(){
 		QPushButton *SButton = new QPushButton("Search");
 		keyword = new QLineEdit();
 
-		//Search->addWidget(new QLabel("Selected repo : "), 0, 0);
-		Search->addWidget(new QLabel(), 0, 1);
 		Search->addWidget(new QLabel("Keyword Search : "), 1, 0);
 		Search->addWidget(keyword, 1, 1);
 		Search->addWidget(SButton, 1, 2);
@@ -25,23 +23,29 @@ SearchTab::SearchTab(){
 }
 	void SearchTab::SearchClicked()
 	{
-
+		GITPP::REPO r(myDirStr)
 		std::string data = keyword->text().toStdString();
 
-		Search->addWidget(new QLabel("Branch"), 3, 0);
 		Search->addWidget(new QLabel("Date"), 3, 1);
 		Search->addWidget(new QLabel("Author"), 3, 2);
 		Search->addWidget(new QLabel("Message"), 3, 3);
+
+		QString t;
+		QString author;
+		QString message;
 
 		int x = 4;
 		for(auto i:r.commits())
 		{
 			if(i.message().find(data) != std::string::npos)
 			{
-				Search->addWidget(new QLabel(i.branch()), x, 0);
-				Search->addWidget(new QLabel(i.time()), x, 1);
-				Search->addWidget(new QLabel(i.signature().name()), x, 2);
-				Search->addWidget(new QLabel(i.message()), x, 3);
+				t = QString::toStdString(i.time());
+				author = QString::toStdString(i.signature().name());
+				message QString::toStdString(i.message());
+
+				Search->addWidget(new QLabel(t, x, 1);
+				Search->addWidget(new QLabel(author), x, 2);
+				Search->addWidget(new QLabel(message), x, 3);
 				x++;
 			}
 		}
