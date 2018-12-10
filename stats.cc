@@ -45,8 +45,7 @@ void check_lg2(int error, const char *message, const char *extra)
     exit(1);
 }
 
-
-/** The 'opts' struct captures all the various parsed command line options. */
+/* The 'opts' struct captures all the various parsed command line options. */
 struct opts {
     git_diff_options diffopts;
     git_diff_find_options findopts;
@@ -145,7 +144,6 @@ static void push_rev(struct log_state *s, git_object *obj, int hide)
     git_object_free(obj);
 }
 
-
 void MainWindow::loadData ()
 {
 
@@ -214,10 +212,9 @@ void MainWindow::loadData ()
         total_deletions += stats->deletions;
         total_files_changed += stats->files_changed;
 
-/*
-        git_diff_free(diff);
+        /* git_diff_free(diff);
         git_tree_free(a);
-        git_tree_free(b);*/
+        git_tree_free(b); */
     }
 
     // clear the list
@@ -255,10 +252,8 @@ void MainWindow::loadData ()
         itemidx++;
     }
     // Cleanup before exiting.
-/*
-    git_diff_stats_free(stats);
-    git_diff_free(diff);
-    */
+    /* git_diff_stats_free(stats);
+    git_diff_free(diff); */
 }
 
 void MainWindow::totals ()
@@ -312,7 +307,7 @@ void MainWindow::save ()
       QTextStream out(&csvFile);
       out << textData;
       csvFile.close();
-
+      // Dialog for success
       QMessageBox msgBox(this);
       msgBox.setWindowTitle("Notifictation");
       msgBox.setText("File has been succssfully saved!");
