@@ -1,3 +1,5 @@
+#include "gitpp7.h"
+
 #include <QLineEdit>
 #include <QString>
 #include <QGridLayout>

@@ -23,7 +23,7 @@ SearchTab::SearchTab(){
 }
 	void SearchTab::SearchClicked()
 	{
-		GITPP::REPO r(myDirStr)
+		GITPP::REPO r(myDirStr);
 		std::string data = keyword->text().toStdString();
 
 		Search->addWidget(new QLabel("Date"), 3, 1);
@@ -39,11 +39,11 @@ SearchTab::SearchTab(){
 		{
 			if(i.message().find(data) != std::string::npos)
 			{
-				t = QString::toStdString(i.time());
-				author = QString::toStdString(i.signature().name());
-				message QString::toStdString(i.message());
+				t = QString::fromStdString(i.time());
+				author = QString::fromStdString(i.signature().name());
+				message = QString::fromStdString(i.message());
 
-				Search->addWidget(new QLabel(t, x, 1);
+				Search->addWidget(new QLabel(t), x, 1);
 				Search->addWidget(new QLabel(author), x, 2);
 				Search->addWidget(new QLabel(message), x, 3);
 				x++;
@@ -52,7 +52,7 @@ SearchTab::SearchTab(){
 		setLayout(Search);
 	}
 
-	void Clear()
+	/*void Clear()
 	{
 		int x = 4;
 		for(auto i:r.commits())
@@ -66,4 +66,4 @@ SearchTab::SearchTab(){
 				x++;
 			}
 		}
-	}
+	}*/
