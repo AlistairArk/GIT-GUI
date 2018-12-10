@@ -12,7 +12,6 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QTableWidget>
-#include <QHeaderView>
 #include <QTextStream>
 #include "window.h"
 #include "tabs.h"
@@ -113,7 +112,6 @@ StatsHandler::StatsHandler()
 	connect(totals_pushButton, SIGNAL(clicked()), this, SLOT(totals()));
 	connect(save_pushButton, SIGNAL(clicked()), this, SLOT(save()));
 
-	//////////////
 	QHBoxLayout* centralLayout = new QHBoxLayout();
 	QVBoxLayout* verticalLayout = new QVBoxLayout();
 	QHBoxLayout* buttonsLayout = new QHBoxLayout();
@@ -131,7 +129,6 @@ StatsHandler::StatsHandler()
 	centralLayout->addLayout(verticalLayout);
 	setLayout(centralLayout);
   repoInit();
-	///////////////
 }
 
 void StatsHandler::repoInit ()
@@ -167,7 +164,6 @@ void StatsHandler::summary ()
     gitList->setSortingEnabled(true);
 }
 
-
 void StatsHandler::prepareGitList()
 {
 	gitList->verticalHeader()->setVisible(false);
@@ -197,7 +193,6 @@ void StatsHandler::prepareGitList()
 	gitList->setHorizontalHeaderItem(COL_GITLIST_DELETIONS, new QTableWidgetItem("DELETIONS"));
 	gitList->setHorizontalHeaderItem(COL_GITLIST_PER_CHANGES, new QTableWidgetItem("% CHANGES"));
 
-
 }
 
 void StatsHandler::prepareGitListTotals()
@@ -221,8 +216,6 @@ void StatsHandler::prepareGitListTotals()
 
 
 }
-
-
 
 /* Push object (for hide or show) onto revwalker. */
 static void push_rev(struct log_state *s, git_object *obj, int hide)
