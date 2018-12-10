@@ -145,7 +145,6 @@ static void push_rev(struct log_state *s, git_object *obj, int hide)
 
 void MainWindow::loadData ()
 {
-
     git_repository *repo = NULL;
     struct git_diff_stats *stats;
 
