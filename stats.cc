@@ -307,7 +307,7 @@ void MainWindow::save ()
       csvFile.close();
       // Dialog for success
       QMessageBox msgBox(this);
-      msgBox.setWindowTitle("Notifictation");
+      msgBox.setWindowTitle("Notification");
       msgBox.setText("File has been succssfully saved!");
 
       msgBox.setIcon(QMessageBox::Information);
