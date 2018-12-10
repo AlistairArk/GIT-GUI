@@ -13,6 +13,7 @@
 
 HelloWindow::HelloWindow()
 {
+	setFixedSize(640, 480);
 	createWindowContent();
 	createMenuAndStatusBar();
 }
@@ -25,11 +26,11 @@ void HelloWindow::createWindowContent()
 	TabDialog* tabs=new TabDialog();
 
 	QHBoxLayout* layout=new QHBoxLayout();
-	layout->addStretch();
+	//layout->addStretch();
 
 	// transfer ownership?
 	layout->addWidget(tabs);
-	layout->addStretch();
+	//layout->addStretch();
 
 	// Put layout in the middle of the window
 
@@ -42,7 +43,6 @@ void HelloWindow::createWindowContent()
 
 void HelloWindow::createMenuAndStatusBar()
 {
-	statusBar()->showMessage("This is the status bar");
 
 	QMenu* fileMenu = menuBar()->addMenu("&File");
 
