@@ -14,7 +14,6 @@
 #include "globals.h"
 #include "gitpp7.h"
 
-
 using namespace std;
 
 /**
