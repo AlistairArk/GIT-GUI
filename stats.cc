@@ -40,7 +40,7 @@ void check_lg2(int error, const char *message, const char *extra)
     else
         sprintf(tmpbuf, "%s [%d]%s%s\n",
             message, error, lg2spacer, lg2msg);
-    QMessageBox::critical(0, APPTITLE, tmpbuf);
+    QMessageBox::critical(0, "WARNING", tmpbuf);
     exit(1);
 }
 
@@ -118,12 +118,12 @@ struct log_state {
     int revisions;
 };
 
-/* Push object (for hide or show) onto revwalker. */
+/** Push object (for hide or show) onto revwalker. */
 static void push_rev(struct log_state *s, git_object *obj, int hide)
 {
     hide = s->hide ^ hide;
 
-    /* Create revwalker on demand if it doesn't already exist. */
+    /** Create revwalker on demand if it doesn't already exist. */
     if (!s->walker) {
         check_lg2(git_revwalk_new(&s->walker, s->repo),
             "Could not create revision walker", NULL);
@@ -199,7 +199,7 @@ void MainWindow::loadData ()
 
         mapit = m_commits.find (author->name);
         if (mapit == m_commits.end ()) {
-            QMessageBox::critical(0, APPTITLE, "Author not found");
+            QMessageBox::critical(0, "WARNING", "Author not found");
             return;
         }
         mapit->second.insertions += stats->insertions;
