@@ -118,12 +118,12 @@ struct log_state {
     int revisions;
 };
 
-/** Push object (for hide or show) onto revwalker. */
+/* Push object (for hide or show) onto revwalker. */
 static void push_rev(struct log_state *s, git_object *obj, int hide)
 {
     hide = s->hide ^ hide;
 
-    /** Create revwalker on demand if it doesn't already exist. */
+    /* Create revwalker on demand if it doesn't already exist. */
     if (!s->walker) {
         check_lg2(git_revwalk_new(&s->walker, s->repo),
             "Could not create revision walker", NULL);
