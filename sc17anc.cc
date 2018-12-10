@@ -3,7 +3,8 @@
 
 #include <QLabel>
 #include <QPushButton>
-#include <QFileDialog>
+#include <QHeaderView>
+#include <QScrollBar>
 
 namespace search{
 
@@ -13,60 +14,56 @@ SearchTab::SearchTab(){
 		QPushButton *SButton = new QPushButton("Search");
 		keyword = new QLineEdit();
 
-		Search->addWidget(new QLabel("Keyword Search : "), 1, 0);
-		Search->addWidget(keyword, 1, 1);
-		Search->addWidget(SButton, 1, 2);
-		Search->addWidget(new QLabel(""), 2, 0);
+		Search->addWidget(new QLabel("Keyword Search : "), 0, 0);
+		Search->addWidget(keyword, 0, 1);
+		Search->addWidget(SButton, 0, 2);
+		Search->addWidget(new QLabel(""), 1, 0);
 		setLayout(Search);
 
 		connect(SButton, SIGNAL (released()), this, SLOT (SearchClicked()));
 }
 	void SearchTab::SearchClicked()
 	{
+		if(Commits == NULL)
+		{
+			Commits = new QTableWidget();
+			Search->addWidget(Commits);
+		}
+		else
+		{
+			for(int i = Commits->rowCount(); i >= 0; i--)
+			{
+				Commits->removeRow(i);
+			}
+		}
+		Commits->setColumnCount(3);
+		Header<<"Date"<<"Author"<<"Message";
+		Commits->setHorizontalHeaderLabels(Header);
+		Commits->verticalScrollBar()->setDisabled(false);
+		Commits->verticalHeader()->setVisible(false);
+
 		GITPP::REPO r(myDirStr);
 		std::string data = keyword->text().toStdString();
 
-		Search->addWidget(new QLabel("Date"), 3, 1);
-		Search->addWidget(new QLabel("Author"), 3, 2);
-		Search->addWidget(new QLabel("Message"), 3, 3);
-
-		QString t;
-		QString author;
-		QString message;
-
-		int x = 4;
+		int x = 0;
 		for(auto i:r.commits())
 		{
 			if(i.message().find(data) != std::string::npos)
 			{
-				t = QString::fromStdString(i.time());
-				author = QString::fromStdString(i.signature().name());
-				message = QString::fromStdString(i.message());
+				Commits->horizontalHeader()->setStretchLastSection(true);
+				QString t = QString::fromStdString(i.time());
+				QString author = QString::fromStdString(i.signature().name());
+				QString message = QString::fromStdString(i.message());
+				Commits->insertRow(x);
+				Commits->setItem(x, 0, new QTableWidgetItem(t));
+				Commits->setItem(x, 1, new QTableWidgetItem(author));
+				Commits->setItem(x, 2, new QTableWidgetItem(message));
 
-				Search->addWidget(new QLabel(t), x, 1);
-				Search->addWidget(new QLabel(author), x, 2);
-				Search->addWidget(new QLabel(message), x, 3);
 				x++;
 			}
 		}
 		setLayout(Search);
 	}
-
-	/*void Clear()
-	{
-		int x = 4;
-		for(auto i:r.commits())
-		{
-			if(i.message().find(data) != std::string::npos)
-			{
-				Search->addWidget(new QLabel(""), x, 0);
-				Search->addWidget(new QLabel(""), x, 1);
-				Search->addWidget(new QLabel(""), x, 2);
-				Search->addWidget(new QLabel(""), x, 3);
-				x++;
-			}
-		}
-	}*/
 
 	INSTALL_TAB(SearchTab, "Search");
 }

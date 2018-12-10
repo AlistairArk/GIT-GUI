@@ -1,8 +1,8 @@
 #include "gitpp7.h"
-
 #include <QLineEdit>
-#include <QString>
+#include <QTableWidget>
 #include <QGridLayout>
+#include <QStringList>
 
 namespace search{
 
@@ -15,6 +15,8 @@ class SearchTab : public QWidget{
   private:
     QGridLayout *Search;
     QLineEdit *keyword;
+    QTableWidget* Commits = NULL;
+    QStringList Header;
 
   private slots:
     void SearchClicked();
