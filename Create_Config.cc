@@ -13,8 +13,7 @@
 #include <QMessageBox>
 
 
-
-	INSTALL_TAB(HelloWorldLabel, "Select/ Configure git repo");
+namespace config{
 
 	HelloWorldLabel::HelloWorldLabel(){
 
@@ -143,4 +142,7 @@
         );
 			}
 			setConfig->setEnabled(true);
+	}
+
+		INSTALL_TAB(HelloWorldLabel, "Select/ Configure git repo");
 	}

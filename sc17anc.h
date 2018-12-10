@@ -4,6 +4,8 @@
 #include <QString>
 #include <QGridLayout>
 
+namespace search{
+
 class SearchTab : public QWidget{
   Q_OBJECT
 
@@ -17,3 +19,4 @@ class SearchTab : public QWidget{
   private slots:
     void SearchClicked();
 };
+}

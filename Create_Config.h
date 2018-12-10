@@ -3,6 +3,7 @@
 
 class QPushButton;
 
+namespace config{
 class HelloWorldLabel : public QWidget{
     Q_OBJECT
 
@@ -18,3 +19,4 @@ class HelloWorldLabel : public QWidget{
     void on_browse_clicked();
     void on_setConfig_clicked();
 };
+}

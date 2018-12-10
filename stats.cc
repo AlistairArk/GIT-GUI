@@ -10,11 +10,46 @@
 #include <iostream>
 #include <QHeaderView>
 #include <QFileDialog>
+#include <QHBoxLayout>
+#include <QTableWidget>
+#include <QHeaderView>
+#include <QTextStream>
+#include "window.h"
+#include "tabs.h"
 #include "stats.h"
 #include "globals.h"
 #include "gitpp7.h"
 
 using namespace std;
+
+typedef struct {
+    size_t insertions;
+    size_t deletions;
+} diff_file_stats;
+
+struct git_diff_stats {
+    git_diff *diff;
+    diff_file_stats *filestats;
+
+    size_t files_changed;
+    size_t insertions;
+    size_t deletions;
+    size_t renames;
+
+    size_t max_name;
+    size_t max_filestat;
+    int max_digits;
+};
+
+struct log_state {
+    git_repository *repo;
+    const char *repodir;
+    git_revwalk *walker;
+    int hide;
+    int sorting;
+    int revisions;
+};
+namespace stats{
 
 /**
  * Check libgit2 error code, printing error to stderr on failure and
@@ -57,7 +92,49 @@ struct opts {
     const char *dir;
 };
 
-void MainWindow::repoInit ()
+StatsHandler::StatsHandler()
+{
+  QPushButton*	summary_pushButton;
+	QPushButton*	totals_pushButton;
+	QPushButton*	save_pushButton;
+	summary_pushButton = new QPushButton;
+	totals_pushButton = new QPushButton;
+	save_pushButton = new QPushButton;
+	const QSize btnSize = QSize(100, 25);
+	summary_pushButton->setFixedSize(btnSize);
+	totals_pushButton->setFixedSize(btnSize);
+	save_pushButton->setFixedSize(btnSize);
+	summary_pushButton->setText("Summary");
+	totals_pushButton->setText("Totals");
+	save_pushButton->setText("Save");
+
+	// slots
+	connect(summary_pushButton, SIGNAL(clicked()), this, SLOT(summary()));
+	connect(totals_pushButton, SIGNAL(clicked()), this, SLOT(totals()));
+	connect(save_pushButton, SIGNAL(clicked()), this, SLOT(save()));
+
+	//////////////
+	QHBoxLayout* centralLayout = new QHBoxLayout();
+	QVBoxLayout* verticalLayout = new QVBoxLayout();
+	QHBoxLayout* buttonsLayout = new QHBoxLayout();
+	QHBoxLayout* saveButtonsLayout = new QHBoxLayout();
+
+	gitList = new QTableWidget;
+	buttonsLayout->addWidget(summary_pushButton);
+	buttonsLayout->addWidget(totals_pushButton);
+	saveButtonsLayout->addWidget(save_pushButton);
+	buttonsLayout->setAlignment(Qt::AlignRight);
+	saveButtonsLayout->setAlignment(Qt::AlignRight);
+	verticalLayout->addLayout(buttonsLayout);
+	verticalLayout->addWidget(gitList);
+	verticalLayout->addLayout(saveButtonsLayout);
+	centralLayout->addLayout(verticalLayout);
+	setLayout(centralLayout);
+  repoInit();
+	///////////////
+}
+
+void StatsHandler::repoInit ()
 {
     std::string path=".";
     GITPP::REPO repository(path.c_str());
@@ -73,7 +150,7 @@ void MainWindow::repoInit ()
     summary ();
 }
 
-void MainWindow::summary ()
+void StatsHandler::summary ()
 {
     // reset totals by user
     QHeaderView* head = gitList->horizontalHeader();
@@ -90,33 +167,62 @@ void MainWindow::summary ()
     gitList->setSortingEnabled(true);
 }
 
-typedef struct {
-    size_t insertions;
-    size_t deletions;
-} diff_file_stats;
 
-struct git_diff_stats {
-    git_diff *diff;
-    diff_file_stats *filestats;
+void StatsHandler::prepareGitList()
+{
+	gitList->verticalHeader()->setVisible(false);
+	gitList->setSelectionBehavior(QAbstractItemView::SelectRows);
+	gitList->setSelectionMode(QAbstractItemView::SingleSelection);
+	gitList->setShowGrid(false);
+	COL_GITLIST_COUNT = 6;  // how many columns in this list
+	COL_GITLIST_ITEM = 0;
+	COL_GITLIST_AUTHOR = 1;
+	COL_GITLIST_COMMITS = 2;
+	COL_GITLIST_INSERTIONS = 3;
+	COL_GITLIST_DELETIONS = 4;
+	COL_GITLIST_PER_CHANGES = 5;
+	gitList->setColumnCount(COL_GITLIST_COUNT);
+	gitList->setColumnWidth(COL_GITLIST_ITEM, 60);
+	gitList->setColumnWidth(COL_GITLIST_AUTHOR, 150);
+	gitList->setColumnWidth(COL_GITLIST_COMMITS, 90);
+	gitList->setColumnWidth(COL_GITLIST_INSERTIONS, 90);
+	gitList->setColumnWidth(COL_GITLIST_DELETIONS, 90);
+	gitList->setColumnWidth(COL_GITLIST_PER_CHANGES, 90);
+	gitList->horizontalHeader()->setStretchLastSection(true); // make the table fills the window
 
-    size_t files_changed;
-    size_t insertions;
-    size_t deletions;
-    size_t renames;
+	gitList->setHorizontalHeaderItem(COL_GITLIST_ITEM, new QTableWidgetItem("ITEM"));
+	gitList->setHorizontalHeaderItem(COL_GITLIST_AUTHOR, new QTableWidgetItem("AUTHOR"));
+	gitList->setHorizontalHeaderItem(COL_GITLIST_COMMITS, new QTableWidgetItem("COMMITS"));
+	gitList->setHorizontalHeaderItem(COL_GITLIST_INSERTIONS, new QTableWidgetItem("INSERTIONS"));
+	gitList->setHorizontalHeaderItem(COL_GITLIST_DELETIONS, new QTableWidgetItem("DELETIONS"));
+	gitList->setHorizontalHeaderItem(COL_GITLIST_PER_CHANGES, new QTableWidgetItem("% CHANGES"));
 
-    size_t max_name;
-    size_t max_filestat;
-    int max_digits;
-};
 
-struct log_state {
-    git_repository *repo;
-    const char *repodir;
-    git_revwalk *walker;
-    int hide;
-    int sorting;
-    int revisions;
-};
+}
+
+void StatsHandler::prepareGitListTotals()
+{
+	COL_GITLIST_COUNT = 4;  // how many columns in this list
+	COL_GITLIST_ITEM = 0;
+	COL_GITLIST_COMMITS = 1;
+	COL_GITLIST_INSERTIONS = 2;
+	COL_GITLIST_DELETIONS = 3;
+	gitList->setColumnCount(COL_GITLIST_COUNT);
+	gitList->setColumnWidth(COL_GITLIST_ITEM, 60);
+	gitList->setColumnWidth(COL_GITLIST_COMMITS, 150);
+	gitList->setColumnWidth(COL_GITLIST_INSERTIONS, 150);
+	gitList->setColumnWidth(COL_GITLIST_DELETIONS, 150);
+	gitList->horizontalHeader()->setStretchLastSection(true); // make the table fills the window
+
+	gitList->setHorizontalHeaderItem(COL_GITLIST_ITEM, new QTableWidgetItem("ITEM"));
+	gitList->setHorizontalHeaderItem(COL_GITLIST_COMMITS, new QTableWidgetItem("COMMITS"));
+	gitList->setHorizontalHeaderItem(COL_GITLIST_INSERTIONS, new QTableWidgetItem("INSERTIONS"));
+	gitList->setHorizontalHeaderItem(COL_GITLIST_DELETIONS, new QTableWidgetItem("DELETIONS"));
+
+
+}
+
+
 
 /* Push object (for hide or show) onto revwalker. */
 static void push_rev(struct log_state *s, git_object *obj, int hide)
@@ -143,7 +249,7 @@ static void push_rev(struct log_state *s, git_object *obj, int hide)
     git_object_free(obj);
 }
 
-void MainWindow::loadData ()
+void StatsHandler::loadData ()
 {
     git_repository *repo = NULL;
     struct git_diff_stats *stats;
@@ -254,7 +360,7 @@ void MainWindow::loadData ()
     git_diff_free(diff); */
 }
 
-void MainWindow::totals ()
+void StatsHandler::totals ()
 {
     // clear the list
     m_skip_list = true;
@@ -278,7 +384,7 @@ void MainWindow::totals ()
     gitList->item (row, COL_GITLIST_DELETIONS)->setText(QString::number(total_deletions));
 }
 
-void MainWindow::save ()
+void StatsHandler::save ()
 {
   QString file = QFileDialog::getSaveFileName(this, "Save File" ,"", tr("CSV Files (*.csv)"));
   if(file.isEmpty())
@@ -315,4 +421,6 @@ void MainWindow::save ()
       msgBox.exec();
 
     }
+}
+  INSTALL_TAB(StatsHandler, "Statistics");
 }

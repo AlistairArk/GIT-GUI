@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-INSTALL_TAB(SearchTab, "Search");
+namespace search{
 
 SearchTab::SearchTab(){
 
@@ -67,3 +67,6 @@ SearchTab::SearchTab(){
 			}
 		}
 	}*/
+
+	INSTALL_TAB(SearchTab, "Search");
+}

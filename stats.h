@@ -10,6 +10,7 @@
 class QLabel;
 class QWidget;
 
+namespace stats{
 struct CommitData {
 	size_t insertions;
 	size_t deletions;
@@ -17,20 +18,16 @@ struct CommitData {
 	std::vector<std::string>    ids;
 };
 
-class MainWindow: public QMainWindow {
+class StatsHandler: public QWidget {
 	Q_OBJECT
 
 public:
-	MainWindow
+	StatsHandler();
 
 private slots:
 	void            summary();
 	void            totals();
 	void            save();
-
-private:
-	void createWindowContent();
-	void createMenuAndStatusBar();
 
 private: // widgets needed
 	QLabel*			_label;
@@ -54,3 +51,4 @@ private: // widgets needed
 	int COL_GITLIST_DELETIONS;
 	int COL_GITLIST_PER_CHANGES;
 };
+}
