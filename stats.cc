@@ -11,10 +11,11 @@
 #include <QHeaderView>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QTableWidget>
 #include <QTextStream>
 #include "window.h"
 #include "tabs.h"
-#include "ll16z4r.h"
+#include "stats.h"
 #include "globals.h"
 #include "gitpp7.h"
 
