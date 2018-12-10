@@ -2,6 +2,7 @@
 #include "branch.h"
 #include "gitpp7.h"
 
+
 #include <QPushButton>
 #include <QFormLayout>
 #include <QFileDialog>
@@ -18,10 +19,10 @@ BranchHandler::BranchHandler(){
 
     // Make Widgets
     QPushButton *branch = new QPushButton("&Branch Repo", this);
-    QListWidget *listWidget = new QListWidget;
+    listWidget = new QListWidget;
 
 
-    GITPP::REPO r; //(myDirStr) // add myDirStr to globals.h for compatibility? 
+    GITPP::REPO r(myDirStr); // add myDirStr to globals.h for compatibility?
 
     // Populate list widget
     for(GITPP::BRANCH i : r.branches()){
@@ -30,6 +31,10 @@ BranchHandler::BranchHandler(){
         listWidget->addItem(c);
     }
 
+    choice = 0;
+    // Set Default branch color
+    listWidget->item(choice)->setForeground(Qt::black);
+    listWidget->item(choice)->setBackground(Qt::green);
 
     // Add Widgets
     QFormLayout *formLayout = new QFormLayout;
@@ -47,10 +52,14 @@ BranchHandler::BranchHandler(){
 
 
 void BranchHandler::on_pushButton_clicked(){
-    GITPP::REPO r; //(myDirStr) // add myDirStr to globals.h? 
 
-    //Somehow get index of selected branch from "listWidget"
-    int choice = 0;
+    GITPP::REPO r(myDirStr); // connect to repo
+
+    listWidget->item(choice)->setForeground(Qt::black);   // Revert color of last item
+    listWidget->item(choice)->setBackground(Qt::white);   // Revert color of last item
+    choice = listWidget->currentRow();                    // Get index of selected branch from "listWidget"
+    listWidget->item(choice)->setForeground(Qt::black);   // Set color of New item
+    listWidget->item(choice)->setBackground(Qt::green);   // Set color of New item
 
     int branchCounter = -1;         // Reset branchCounter
 
@@ -63,7 +72,7 @@ void BranchHandler::on_pushButton_clicked(){
             auto c=r.config();
             if (c["core.bare"].value()=="true"){
 
-                    QMessageBox::information(nullptr/*or parent*/, "WARNING",  
+                    QMessageBox::information(nullptr/*or parent*/, "WARNING",
                         QString("Cannot checkout. This operation is not allowed against bare repositories.\nPlease change modes and try again."),
                         QMessageBox::Ok);
 
@@ -79,7 +88,7 @@ void BranchHandler::on_pushButton_clicked(){
                     std::string str = i.name();
                     const char * c = str.c_str();
 
-                    QMessageBox::information(nullptr/*or parent*/, "SUCCESS",  
+                    QMessageBox::information(nullptr/*or parent*/, "SUCCESS",
                         QString("You have connected to the following branch: %1")
                         .arg(c),
 
@@ -90,14 +99,14 @@ void BranchHandler::on_pushButton_clicked(){
                 }catch(const std::exception& e){
                     std::string str = "e.what()";
 
-                    QMessageBox::information(nullptr/*or parent*/, "WARNING",  
+                    QMessageBox::information(nullptr/*or parent*/, "WARNING",
                         QString("The following error has occurred: \n %1 \nPlease resolve the aforementioned conflicts before trying again.")
                         .arg(e.what()),
 
                         QMessageBox::Ok);
 
                 }
-            }                
+            }
         }
     }
 }
