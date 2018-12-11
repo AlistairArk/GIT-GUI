@@ -1,6 +1,7 @@
+//formerly Create_Config.cc
 #include "globals.h"
 #include "gitpp7.h"
-#include "Create_Config.h"
+#include "sc17sxa.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -55,12 +56,23 @@ namespace config{
 		GITPP::REPO r(myDirStr);
 		auto c=r.config();
 
-		//TODO :: stop this from crashig!
-		//maybe try settinig git config manually through command line first then try though the app?
-		//set user defined confi to repo config
-		//THIS PROBABLY DOESNT DO WHAT I THINK IT DOES
-		GITPP::CONFIG::ITEM email=c["user.email"] = user_email.toStdString();
-		GITPP::CONFIG::ITEM name=c["user.name"] = username.toStdString();
+		//set user defined config to repo config
+
+		//if there is no config entry create them
+		try{
+			GITPP::CONFIG::ITEM email=c["user.email"] = user_email.toStdString();
+		}catch(GITPP::EXCEPTION_CANT_FIND const&){
+			c.create("user.email");
+			GITPP::CONFIG::ITEM email=c["user.email"] = user_email.toStdString();
+		}
+
+		try{
+				 GITPP::CONFIG::ITEM name=c["user.name"] = username.toStdString();
+	 	}catch(GITPP::EXCEPTION_CANT_FIND const&){
+			c.create("user.name");
+			GITPP::CONFIG::ITEM name=c["user.name"] = username.toStdString();
+		}
+
 
 		//update placeholders
 		lnEditEmail->setPlaceholderText(user_email);
@@ -69,8 +81,8 @@ namespace config{
 		//this will notify the user that changes have been mad successfully once this works properly
 		QMessageBox::question(
 				this,
-				tr("It's working!"),
-				tr("Is this working?"),
+				tr("Configuration applied!"),
+				tr("Git repo configuration settings applied"),
 
 				QMessageBox::Ok
 		 );
@@ -107,8 +119,6 @@ namespace config{
 
 			}
 
-
-
 			GITPP::REPO r(myDirStr);
 			auto c=r.config();
 
@@ -116,6 +126,7 @@ namespace config{
 			try{
 				GITPP::CONFIG::ITEM name=c["user.name"];
 				QString username = QString::fromStdString(name.value());
+				lnEditUsername->setPlaceholderText(username);
 			}catch(GITPP::EXCEPTION_CANT_FIND const&){
 				//if no user name exists then notify
 				QMessageBox::question(
@@ -131,6 +142,7 @@ namespace config{
 			try{
 				GITPP::CONFIG::ITEM email=c["user.email"];
 				QString user_email = QString::fromStdString(email.value());
+				lnEditEmail->setPlaceholderText(user_email);
 			}catch(GITPP::EXCEPTION_CANT_FIND const&){
 				//if no email exists then notify
 				QMessageBox::question(
