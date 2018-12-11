@@ -17,41 +17,47 @@
 
 
 
-
-
 INSTALL_TAB(BranchHandler, "Branch Repository");
 
 int repoCheck(){ // Checks to see if valid repo path entered
     try{
         GITPP::REPO r(myDirStr);
-        return(1); 
+        return(1);
     }catch(const std::exception& e){
         return(0); // No repo loaded
     }
 }
 
 
-BranchHandler::BranchHandler(){
+void BranchHandler::populateList(){
+    GITPP::REPO r(myDirStr);
+    int counter = -1;
 
+    // Populate list widget
+    for(GITPP::BRANCH i : r.branches()){
+        counter ++;                     // Incriment counter
+        std::string str = i.name();
+        const char * c = str.c_str();
+        listWidget->addItem(c);
+
+        if ("master" == i.name()){
+            branchIndex = counter;
+            // Set Default branch color
+            listWidget->item(branchIndex)->setForeground(Qt::black);
+            listWidget->item(branchIndex)->setBackground(Qt::green);
+        }
+    }
+}
+
+
+BranchHandler::BranchHandler(){
 
     // Make Widgets
     QPushButton *branch = new QPushButton("&Branch Repo", this);
     listWidget = new QListWidget;
 
     if (repoCheck()){
-        GITPP::REPO r(myDirStr); // add myDirStr to globals.h for compatibility?
-
-        // Populate list widget
-        for(GITPP::BRANCH i : r.branches()){
-            std::string str = i.name();
-            const char * c = str.c_str();
-            listWidget->addItem(c);
-        }
-
-        choice = 0;
-        // Set Default branch color
-        listWidget->item(choice)->setForeground(Qt::black);
-        listWidget->item(choice)->setBackground(Qt::green);
+        populateList();
     }
 
     // Add Widgets
@@ -59,10 +65,7 @@ BranchHandler::BranchHandler(){
     formLayout->addRow(tr("&Branch Repository:"), branch);
     formLayout->addRow(listWidget);
 
-
-
     setLayout(formLayout);
-
     connect(branch, SIGNAL (released()),this, SLOT (on_pushButton_clicked()));
 
 }
@@ -71,29 +74,21 @@ BranchHandler::BranchHandler(){
 
 void BranchHandler::on_pushButton_clicked(){
     if (repoCheck()){
-        GITPP::REPO r(myDirStr); // connect to repo
+        GITPP::REPO r(myDirStr);                // connect to repo
 
-        int lastChoice = choice;
-        choice = listWidget->currentRow();                    // Get index of selected branch from "listWidget"
-        
+        int selectedBranch = listWidget->currentRow();  // Get index of selected branch from "listWidget"
+        int branchCounter = -1;                 // Reset branchCounter
 
-
-        int branchCounter = -1;         // Reset branchCounter
-
-
-        for(GITPP::BRANCH i : r.branches()){ // Loop till chosen branch found
+        for(GITPP::BRANCH i : r.branches()){    // Loop till chosen branch found
             branchCounter+=1;
-            if (choice == branchCounter){
+            if (selectedBranch == branchCounter){
 
                 // Ensue repo is not bare before checking out
                 auto c=r.config();
                 if (c["core.bare"].value()=="true"){
-
-                        QMessageBox::information(nullptr/*or parent*/, "WARNING",
+                        QMessageBox::warning(nullptr/*or parent*/, "WARNING",
                             QString("Cannot checkout. This operation is not allowed against bare repositories.\nPlease change modes and try again."),
                             QMessageBox::Ok);
-
-
                 }else{
 
                     // Error check required as conflicts can prevent checkout of branches
@@ -101,26 +96,25 @@ void BranchHandler::on_pushButton_clicked(){
                         r.checkout(i.name());           // Switch to branch
                        // listCommit(0);                // Now list commits in this branch
 
-
                         std::string str = i.name();
                         const char * c = str.c_str();
 
-                        listWidget->item(lastChoice)->setForeground(Qt::black);   // Revert color of last item
-                        listWidget->item(lastChoice)->setBackground(Qt::white);   // Revert color of last item
-                        listWidget->item(choice)->setForeground(Qt::black);   // Set color of New item
-                        listWidget->item(choice)->setBackground(Qt::green);   // Set color of New item
+                        listWidget->item(branchIndex)->setForeground(Qt::black);   // Revert color of last item
+                        listWidget->item(branchIndex)->setBackground(Qt::white);   // Revert color of last item
+                        listWidget->item(selectedBranch)->setForeground(Qt::black);   // Set color of New item
+                        listWidget->item(selectedBranch)->setBackground(Qt::green);   // Set color of New item
+                        branchIndex = selectedBranch;
                         QMessageBox::information(nullptr/*or parent*/, "SUCCESS",
                             QString("You have connected to the following branch: %1")
                             .arg(c),
 
                             QMessageBox::Ok);
-
-
                         break;                          // Break out of loop
+
                     }catch(const std::exception& e){
                         std::string str = "e.what()";
 
-                        QMessageBox::information(nullptr/*or parent*/, "WARNING",
+                        QMessageBox::critical(nullptr/*or parent*/, "WARNING",
                             QString("The following error has occurred: \n %1 \nPlease resolve the aforementioned conflicts before trying again.")
                             .arg(e.what()),
 
@@ -130,8 +124,10 @@ void BranchHandler::on_pushButton_clicked(){
                 }
             }
         }
+    }else{ // If not connected to a repo
+        QMessageBox::information(nullptr/*or parent*/, "NOTICE",
+            QString("You must be connected to a repo before doing that!"),
+
+            QMessageBox::Ok);
     }
 }
-
-
-
