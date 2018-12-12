@@ -3,3 +3,4 @@
 
 WidgetDispatcher myTabs;
 std::string myDirStr;
+std::string myBranchStr;
