@@ -72,7 +72,7 @@ SearchTab::SearchTab(){
 		}
 		catch(GITPP::EXCEPTION_CANT_FIND const&)
 		{
-			QMessageBox::information(
+			QMessageBox::warning(
 				this,
 				tr("Warning!"),
 				tr("No git repository selected"));
