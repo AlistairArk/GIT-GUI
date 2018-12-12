@@ -146,22 +146,12 @@ StatsHandler::StatsHandler()
     repoInit();
 }
 
-// Check if the repo exist and initialize the std::map with the authors names
+// Initialize the std::map with the authors names
 void StatsHandler::repoInit ()
 {
     std::string path=".";
-    QString qitFolderName(QString(path.c_str())+"/.git");
-    QFile gitFolder (qitFolderName);
-
-    if (!gitFolder.exists()) {	// check if valid repo
-            QMessageBox::critical(0, "warning!", ".git repo not found");
-	    QApplication::instance()->quit();
-	    exit (1);
-    }
     GITPP::REPO repository(path.c_str());
-    // clear the std::map first
     m_commits.erase (m_commits.begin (), m_commits.end ());
-    // initialize
     for(auto i : repository.branches())
     {
         repository.checkout(i.name());
