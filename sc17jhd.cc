@@ -19,7 +19,7 @@
 
 INSTALL_TAB(BranchHandler, "Branch Repository");
 
-int repoCheck(){ // Checks to see if valid repo path entered
+int BranchHandler::repoCheck(){ // Checks to see if valid repo path entered
     try{
         GITPP::REPO r(myDirStr);
         return(1);
@@ -29,7 +29,30 @@ int repoCheck(){ // Checks to see if valid repo path entered
 }
 
 
-void BranchHandler::populateList(){
+
+
+int BranchHandler::doRefresh(bool silent){
+    // Checks to see if the repo has switched since last called
+    // Refreshes tab if a change was detected
+
+    const char * oldDir = lastMyDirStr.c_str();
+    const char * newDir = myDirStr.c_str();
+
+    if (oldDir!=newDir){
+        lastMyDirStr = myDirStr;
+        listWidget->clear();        // Clear the listWidget
+        populateList();             // Populate the listWidget
+        return 1; // Repo Switched
+    }else{
+        if (!silent)
+            QMessageBox::information(nullptr/*or parent*/, "NOTICE",
+                QString("Nothing to refresh!"),
+                QMessageBox::Ok);
+        return 0;
+    }
+}
+
+void BranchHandler::populateList(){     // Fills the branch listWidget
     GITPP::REPO r(myDirStr);
     int counter = -1;
 
@@ -51,9 +74,11 @@ void BranchHandler::populateList(){
 
 
 BranchHandler::BranchHandler(){
+    myBranchStr = "master";     // Set default branch at runtime
 
     // Make Widgets
     QPushButton *branch = new QPushButton("&Branch Repo", this);
+    QPushButton *refresh = new QPushButton("&Refresh Tab", this);
     listWidget = new QListWidget;
 
     if (repoCheck()){
@@ -62,68 +87,78 @@ BranchHandler::BranchHandler(){
 
     // Add Widgets
     QFormLayout *formLayout = new QFormLayout;
+    formLayout->addRow(refresh);
     formLayout->addRow(tr("&Branch Repository:"), branch);
     formLayout->addRow(listWidget);
 
     setLayout(formLayout);
-    connect(branch, SIGNAL (released()),this, SLOT (on_pushButton_clicked()));
+    connect(branch, SIGNAL (released()),this, SLOT (doBranch()));
+    connect(refresh, SIGNAL (released()),this, SLOT (doRefresh(0)));
 
 }
 
 
 
-void BranchHandler::on_pushButton_clicked(){
+void BranchHandler::doBranch(){
     if (repoCheck()){
-        GITPP::REPO r(myDirStr);                // connect to repo
+        if (doRefresh(1)) { // If repo has not been switched
+            QMessageBox::information(nullptr/*or parent*/, "NOTICE",
+                QString("Repo is refreshing!"),
+                QMessageBox::Ok);
+        }else{
+            GITPP::REPO r(myDirStr);                // connect to repo
 
-        int selectedBranch = listWidget->currentRow();  // Get index of selected branch from "listWidget"
-        int branchCounter = -1;                 // Reset branchCounter
+            int selectedBranch = listWidget->currentRow();  // Get index of selected branch from "listWidget"
+            int branchCounter = -1;                 // Reset branchCounter
 
-        for(GITPP::BRANCH i : r.branches()){    // Loop till chosen branch found
-            branchCounter+=1;
-            if (selectedBranch == branchCounter){
+            for(GITPP::BRANCH i : r.branches()){    // Loop till chosen branch found
+                branchCounter+=1;
+                if (selectedBranch == branchCounter){
 
-                // Ensue repo is not bare before checking out
-                auto c=r.config();
-                if (c["core.bare"].value()=="true"){
-                        QMessageBox::warning(nullptr/*or parent*/, "WARNING",
-                            QString("Cannot checkout. This operation is not allowed against bare repositories.\nPlease change modes and try again."),
-                            QMessageBox::Ok);
-                }else{
+                    // Ensue repo is not bare before checking out
+                    auto c=r.config();
+                    if (c["core.bare"].value()=="true"){
+                            QMessageBox::warning(nullptr/*or parent*/, "WARNING",
+                                QString("Cannot checkout. This operation is not allowed against bare repositories.\nPlease change modes and try again."),
+                                QMessageBox::Ok);
+                    }else{
 
-                    // Error check required as conflicts can prevent checkout of branches
-                    try{
-                        r.checkout(i.name());           // Switch to branch
-                       // listCommit(0);                // Now list commits in this branch
+                        // Error check required as conflicts can prevent checkout of branches
+                        try{
+                            myBranchStr = i.name();
+                            r.checkout(myBranchStr);           // Switch to branch
+                           // listCommit(0);                // Now list commits in this branch
 
-                        std::string str = i.name();
-                        const char * c = str.c_str();
+                            std::string str = i.name();
+                            const char * c = str.c_str();
 
-                        listWidget->item(branchIndex)->setForeground(Qt::black);   // Revert color of last item
-                        listWidget->item(branchIndex)->setBackground(Qt::white);   // Revert color of last item
-                        listWidget->item(selectedBranch)->setForeground(Qt::black);   // Set color of New item
-                        listWidget->item(selectedBranch)->setBackground(Qt::green);   // Set color of New item
-                        branchIndex = selectedBranch;
-                        QMessageBox::information(nullptr/*or parent*/, "SUCCESS",
-                            QString("You have connected to the following branch: %1")
-                            .arg(c),
+                            listWidget->item(branchIndex)->setForeground(Qt::black);   // Revert color of last item
+                            listWidget->item(branchIndex)->setBackground(Qt::white);   // Revert color of last item
+                            listWidget->item(selectedBranch)->setForeground(Qt::black);   // Set color of New item
+                            listWidget->item(selectedBranch)->setBackground(Qt::green);   // Set color of New item
+                            branchIndex = selectedBranch;
+                            QMessageBox::information(nullptr/*or parent*/, "SUCCESS",
+                                QString("You have connected to the following branch: %1")
+                                .arg(c),
 
-                            QMessageBox::Ok);
-                        break;                          // Break out of loop
+                                QMessageBox::Ok);
+                            break;                          // Break out of loop
 
-                    }catch(const std::exception& e){
-                        std::string str = "e.what()";
+                        }catch(const std::exception& e){
+                            std::string str = "e.what()";
 
-                        QMessageBox::critical(nullptr/*or parent*/, "WARNING",
-                            QString("The following error has occurred: \n %1 \nPlease resolve the aforementioned conflicts before trying again.")
-                            .arg(e.what()),
+                            QMessageBox::critical(nullptr/*or parent*/, "WARNING",
+                                QString("The following error has occurred: \n %1 \nPlease resolve the aforementioned conflicts before trying again.")
+                                .arg(e.what()),
 
-                            QMessageBox::Ok);
+                                QMessageBox::Ok);
 
+                        }
                     }
                 }
             }
         }
+
     }else{ // If not connected to a repo
         QMessageBox::information(nullptr/*or parent*/, "NOTICE",
             QString("You must be connected to a repo before doing that!"),
