@@ -10,9 +10,14 @@ class BranchHandler : public QWidget{
     public:
         BranchHandler();
         int branchIndex=0;
+        std::string lastMyDirStr;
+
+
 
     private slots:
-        void on_pushButton_clicked();
+        int repoCheck();
+        void doBranch();
+        int doRefresh(bool);
         void populateList();
     private:
         QListWidget *listWidget;
