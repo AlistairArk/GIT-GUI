@@ -4,11 +4,11 @@
 class QPushButton;
 
 namespace config{
-class HelloWorldLabel : public QWidget{
+class GitConfig : public QWidget{
     Q_OBJECT
 
   public:
-    HelloWorldLabel();
+    GitConfig();
 
   private:
     QLineEdit *lnEditEmail;

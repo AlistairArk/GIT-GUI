@@ -16,7 +16,7 @@
 
 namespace config{
 
-	HelloWorldLabel::HelloWorldLabel(){
+	GitConfig::GitConfig(){
 
 		//Creates form items
 		QPushButton *browse = new QPushButton("&Select Directory", this);
@@ -31,8 +31,8 @@ namespace config{
 		//sets form layout
 		QFormLayout *formLayout = new QFormLayout;
 		formLayout->addRow(tr("&Browse to Directory to locate/create git repo:"), browse);
-		formLayout->addRow(tr("&Change Username:"), lnEditUsername);//username
-		formLayout->addRow(tr("&Change Email:"), lnEditEmail);//email
+		formLayout->addRow(tr("&Change Username:"), lnEditUsername);
+		formLayout->addRow(tr("&Change Email:"), lnEditEmail);
 		formLayout->addRow(setConfig);
 		//formLayout->addRow(tr("&Browse to Directory to locate/create git repo:"), button);//assign/change remote
 
@@ -45,7 +45,7 @@ namespace config{
 
 	}
 
-	void HelloWorldLabel::on_setConfig_clicked()
+	void GitConfig::on_setConfig_clicked()
 	{
 		//need to do input validation
 		//get text from user
@@ -88,12 +88,13 @@ namespace config{
 		 );
 	}
 
-	void HelloWorldLabel::on_browse_clicked()
+	void GitConfig::on_browse_clicked()
 	{
 		//opens file browse dialog and saves directory to dir
 		 QString myDir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),"/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
 		 myDirStr = myDir.toUtf8().constData();
+		 myBranchStr = "master";
 
 		 //git repo verificatiton
 		 try{
@@ -156,5 +157,5 @@ namespace config{
 			setConfig->setEnabled(true);
 	}
 
-		INSTALL_TAB(HelloWorldLabel, "Select/ Configure git repo");
+		INSTALL_TAB(GitConfig, "Select/ Configure git repo");
 	}
