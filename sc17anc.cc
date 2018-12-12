@@ -51,24 +51,43 @@ SearchTab::SearchTab(){
 			Commits->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
 			std::string data = keyword->text().toStdString();
-
-			int x = 0;
-			for(auto i:r.commits())
+			if(data == "")
 			{
-				if(i.message().find(data) != std::string::npos)
+				QMessageBox::information(
+					this,
+					tr("Error!"),
+					tr("Please enter a valid keyword"));
+			}
+			else
+			{
+				int x = 0;
+				for(auto i:r.commits())
 				{
-					QString t = QString::fromStdString(i.time());
-					QString author = QString::fromStdString(i.signature().name());
-					QString message = QString::fromStdString(i.message());
-					Commits->insertRow(x);
-					Commits->setItem(x, 0, new QTableWidgetItem(t));
-					Commits->setItem(x, 1, new QTableWidgetItem(author));
-					Commits->setItem(x, 2, new QTableWidgetItem(message));
+					if(i.message().find(data) != std::string::npos)
+					{
+						QString t = QString::fromStdString(i.time());
+						QString author = QString::fromStdString(i.signature().name());
+						QString message = QString::fromStdString(i.message());
+						Commits->insertRow(x);
+						Commits->setItem(x, 0, new QTableWidgetItem(t));
+						Commits->setItem(x, 1, new QTableWidgetItem(author));
+						Commits->setItem(x, 2, new QTableWidgetItem(message));
 
-					x++;
+						x++;
+					}
+				}
+				if(x == 0)
+				{
+					QMessageBox::information(
+						this,
+						tr("Error!"),
+						tr("No commit messages containing the keyword exist"));
+				}
+				else
+				{
+					setLayout(Search);
 				}
 			}
-			setLayout(Search);
 		}
 		catch(GITPP::EXCEPTION_CANT_FIND const&)
 		{
