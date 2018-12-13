@@ -96,7 +96,6 @@ struct opts {
 StatsHandler::StatsHandler()
 {
     // Initialize the summary, totals and save buttons
-
     QPushButton*	summary_pushButton;
     QPushButton*	totals_pushButton;
     QPushButton*	save_pushButton;
