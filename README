@@ -1,6 +1,12 @@
 == 2811 CW3 material
 
-a qt application with multiple tabs.
+This application displays a user interface that allows the user to select or
+create a git repository, as well as edit the repository's configuration. It then
+allows them to select and view the branches that exist within the git repository.
+They can then view the commits that occurred on said selected branch. In addition,
+statistics relating to the git repository can be viewed and/or saved to the user's
+computer as a csv file. The user is also able to search for commits, whose message
+contains a specific keyword across all branches in a git repository.
 
 == prerequisites
 
