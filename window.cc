@@ -13,7 +13,7 @@
 
 HelloWindow::HelloWindow()
 {
-	setFixedSize(640, 480);
+	setFixedSize(660, 480);
 	createWindowContent();
 	createMenuAndStatusBar();
 }

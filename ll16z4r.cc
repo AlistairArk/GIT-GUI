@@ -214,7 +214,7 @@ void StatsHandler::prepareGitList()
     // assign columns width
 	gitList->setColumnCount(COL_GITLIST_COUNT);
 	gitList->setColumnWidth(COL_GITLIST_ITEM, 60);
-	gitList->setColumnWidth(COL_GITLIST_AUTHOR, 140);
+	gitList->setColumnWidth(COL_GITLIST_AUTHOR, 160);
 	gitList->setColumnWidth(COL_GITLIST_COMMITS, 90);
 	gitList->setColumnWidth(COL_GITLIST_INSERTIONS, 100);
 	gitList->setColumnWidth(COL_GITLIST_DELETIONS, 90);
