@@ -20,6 +20,7 @@ namespace display{
       QStringList Header;
       QPushButton *refreshButton;
       QLabel *label;
+      QLabel *label2;
 
     private slots:
       void refresh();

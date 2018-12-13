@@ -14,6 +14,8 @@ displayCommit::displayCommit(){
 		display = new QGridLayout;
 		refreshButton = new QPushButton("Refresh");
 		label = new QLabel("No repository selected");
+		label2 = new QLabel();
+		label2->setText("Branch Name: Master");
 
 		commits->setColumnCount(3);
 		Header<<"Date"<<"Author"<<"Message";
@@ -41,18 +43,20 @@ displayCommit::displayCommit(){
 		try
 		{
 			GITPP::REPO r(myDirStr);
+			label2->setVisible(true);
 			auto c=r.config();
-			std::cout << c["core.bare"].value();
 			if(c["core.bare"].value()=="true")
 			{
 				r.checkout(myBranchStr);
-				
+				QString b = QString::fromStdString(myBranchStr);
+				label2->setText("Branch name: " + b);
+
 			}
 			int l = 0;
+			display->addWidget(label2,0,0);
 			label->setVisible(false);
 			for(auto i:r.commits())
 			{
-				std::cout << l;
 				QString t = QString::fromStdString(i.time());
 				QString author = QString::fromStdString(i.signature().name());
 				QString message = QString::fromStdString(i.message());
