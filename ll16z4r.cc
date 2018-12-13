@@ -49,8 +49,6 @@ struct log_state {
     int revisions;
 };
 
-int repoCheck();	// check if valid repo
-
 namespace stats{
 
 /**
@@ -151,9 +149,7 @@ StatsHandler::StatsHandler()
     centralLayout->addLayout(verticalLayout);
     setLayout(centralLayout);
     myDirStr = ".";
-    currentDir =  myDirStr;
-    repoInit();
-    summary ();
+    currentDir =  "";	// so at beggining currentDir != myDirStr
 }
 
 // Initialize the std::map with the authors names
@@ -176,9 +172,12 @@ void StatsHandler::repoInit ()
 void StatsHandler::summary ()
 {
     if (currentDir != myDirStr) {
+	if (!validRepo ()) {
+		return;
+	}
 	repoInit ();
     	currentDir =  myDirStr;
-    } 
+    }
     // set the sorting method to the fields in the listing
     QHeaderView* head = gitList->horizontalHeader();
     head->setSortIndicator(-1, Qt::AscendingOrder);
@@ -410,14 +409,36 @@ void StatsHandler::loadData ()
 
 }
 
+int StatsHandler::repoCheck(){ // check to see if valid repo path entered
+    try{
+        GITPP::REPO r(myDirStr);
+        return(1);
+    }catch(const std::exception& e){
+        return(0); // no repo loaded
+    }
+}
+
+
+bool StatsHandler::validRepo ()
+{
+	if (!repoCheck()) {	// check if valid repo
+    		QMessageBox::critical(0, "Error", "Repository .git not found");
+		return false;
+	}
+	return true;
+}
+
 // display the totals listing
 void StatsHandler::totals ()
 {
     if (currentDir != myDirStr) {
+	if (!validRepo ()) {
+		return;
+	}
 	repoInit ();
 	summary ();
     	currentDir =  myDirStr;
-    } 
+    }
     // set the sorting method to the fields in the listing
     // clear the list
     m_skip_list = true;
