@@ -137,6 +137,7 @@ namespace config{
 
             QMessageBox::Ok
         );
+				lnEditUsername->setPlaceholderText("<Username>");
 			}
 
 			//try to retreive the email
@@ -153,6 +154,7 @@ namespace config{
 
             QMessageBox::Ok
         );
+				lnEditEmail->setPlaceholderText("<Email>");
 			}
 			setConfig->setEnabled(true);
 	}
