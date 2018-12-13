@@ -146,21 +146,33 @@ StatsHandler::StatsHandler()
     repoInit();
 }
 
+int StatsHandler::repoCheck(){ // Checks to see if valid repo path entered
+    try{
+        GITPP::REPO r(myDirStr);
+        return(1);
+    }catch(const std::exception& e){
+        return(0); // No repo loaded
+    }
+}
+
+
 // Initialize the std::map with the authors names
 void StatsHandler::repoInit ()
 {
-    std::string path=".";
-    GITPP::REPO repository(path.c_str());
-    m_commits.erase (m_commits.begin (), m_commits.end ());
-    for(auto i : repository.branches())
-    {
-        repository.checkout(i.name());
-        for(auto i : repository.commits())
+    if (repoCheck()){
+        GITPP::REPO repository(myDirStr);
+        m_commits.erase (m_commits.begin (), m_commits.end ());
+        for(auto i : repository.branches())
         {
-            m_commits[i.author()].ids.push_back (i.id());
+            repository.checkout(i.name());
+            for(auto i : repository.commits())
+            {
+                m_commits[i.author()].ids.push_back (i.id());
+            }
         }
+        summary ();
+        
     }
-    summary ();
 }
 
 // Load and display the summary listing
