@@ -385,12 +385,12 @@ void StatsHandler::loadData ()
         size_t per_changes = (((float) files_changed) / ((float)total_files_changed) * 100.0f);
 
         // set the columns in the table
-        gitList->item (row, COL_GITLIST_ITEM)->setText(QString::number(itemidx));
+        gitList->item (row, COL_GITLIST_ITEM)->setData(Qt::DisplayRole, quint32(itemidx));
         gitList->item (row, COL_GITLIST_AUTHOR)->setText(author);
-        gitList->item (row, COL_GITLIST_COMMITS)->setText(QString::number(commits_cnt));
-        gitList->item (row, COL_GITLIST_INSERTIONS)->setText(QString::number(insertions));
-        gitList->item (row, COL_GITLIST_DELETIONS)->setText(QString::number(deletions));
-        gitList->item (row, COL_GITLIST_PER_CHANGES)->setText(QString::number(per_changes));
+        gitList->item (row, COL_GITLIST_COMMITS)->setData(Qt::DisplayRole, quint32(commits_cnt));
+        gitList->item (row, COL_GITLIST_INSERTIONS)->setData(Qt::DisplayRole, quint32(insertions));
+        gitList->item (row, COL_GITLIST_DELETIONS)->setData(Qt::DisplayRole, quint32(deletions));
+        gitList->item (row, COL_GITLIST_PER_CHANGES)->setData(Qt::DisplayRole, quint32(per_changes));
         row++;
         itemidx++;
     }
