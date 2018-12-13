@@ -2,6 +2,9 @@
 #include <QGridLayout>
 #include <QTableWidget>
 #include <QStringList>
+#include <QPushButton>
+#include <QLabel>
+#include <QWidgetItem>
 
 namespace display{
 
@@ -13,7 +16,12 @@ namespace display{
 
     private:
       QGridLayout *display;
-      QTableWidget* commits = NULL;
+      QTableWidget* commits = new QTableWidget();
       QStringList Header;
+      QPushButton *refreshButton;
+      QLabel *label;
+
+    private slots:
+      void refresh();
   };
 }
