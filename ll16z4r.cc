@@ -102,27 +102,32 @@ StatsHandler::StatsHandler()
     QPushButton*	summary_pushButton;
     QPushButton*	totals_pushButton;
     QPushButton*	save_pushButton;
+    QPushButton*	refresh_pushButton;
 
     // create
     summary_pushButton = new QPushButton;
     totals_pushButton = new QPushButton;
     save_pushButton = new QPushButton;
+    refresh_pushButton = new QPushButton;
     const QSize btnSize = QSize(100, 25);
 
     // set size
     summary_pushButton->setFixedSize(btnSize);
     totals_pushButton->setFixedSize(btnSize);
     save_pushButton->setFixedSize(btnSize);
+    refresh_pushButton->setFixedSize(btnSize);
 
     // set the label
     summary_pushButton->setText("Summary");
     totals_pushButton->setText("Totals");
     save_pushButton->setText("Save");
+    refresh_pushButton->setText("Refresh");
 
     // slots
     connect(summary_pushButton, SIGNAL(clicked()), this, SLOT(summary()));
     connect(totals_pushButton, SIGNAL(clicked()), this, SLOT(totals()));
     connect(save_pushButton, SIGNAL(clicked()), this, SLOT(save()));
+    connect(refresh_pushButton, SIGNAL(clicked()), this, SLOT(summary()));
 
     // prepare the layout
     QHBoxLayout* centralLayout = new QHBoxLayout();
@@ -133,8 +138,9 @@ StatsHandler::StatsHandler()
     gitList = new QTableWidget;
 
     // set the layout and assign the widget to each layout in order
-    buttonsLayout->addWidget(summary_pushButton);
-    buttonsLayout->addWidget(totals_pushButton);
+    buttonsLayout->addWidget(refresh_pushButton, 0, Qt::AlignLeft);
+    buttonsLayout->addWidget(summary_pushButton, 2, Qt::AlignRight);
+    buttonsLayout->addWidget(totals_pushButton, 0, Qt::AlignRight);
     saveButtonsLayout->addWidget(save_pushButton);
 
     buttonsLayout->setAlignment(Qt::AlignRight);
