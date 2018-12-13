@@ -1,3 +1,8 @@
+/*
+Branching Tab For Repo GUI Program
+*/
+
+
 #include "globals.h"
 #include "sc17jhd.h"
 #include "gitpp7.h"
@@ -31,26 +36,6 @@ int BranchHandler::repoCheck(){ // Checks to see if valid repo path entered
 
 
 
-int BranchHandler::doRefresh(bool silent){
-    // Checks to see if the repo has switched since last called
-    // Refreshes tab if a change was detected
-
-    const char * oldDir = lastMyDirStr.c_str();
-    const char * newDir = myDirStr.c_str();
-
-    if (oldDir!=newDir){
-        lastMyDirStr = myDirStr;
-        listWidget->clear();        // Clear the listWidget
-        populateList();             // Populate the listWidget
-        return 1; // Repo Switched
-    }else{
-        if (!silent)
-            QMessageBox::information(nullptr/*or parent*/, "NOTICE",
-                QString("Nothing to refresh!"),
-                QMessageBox::Ok);
-        return 0;
-    }
-}
 
 void BranchHandler::populateList(){     // Fills the branch listWidget
     GITPP::REPO r(myDirStr);
@@ -58,7 +43,7 @@ void BranchHandler::populateList(){     // Fills the branch listWidget
 
     // Populate list widget
     for(GITPP::BRANCH i : r.branches()){
-        counter ++;                     // Incriment counter
+        counter ++;                     // Increment counter
         std::string str = i.name();
         const char * c = str.c_str();
         listWidget->addItem(c);
@@ -73,12 +58,36 @@ void BranchHandler::populateList(){     // Fills the branch listWidget
 }
 
 
+
+
+int BranchHandler::doRefresh(bool silent){
+    // Checks to see if the repo has switched since last called
+    // Refreshes tab if a change was detected
+
+    if ((lastMyDirStr!=myDirStr) && repoCheck()){
+        lastMyDirStr = myDirStr;
+        listWidget->clear();        // Clear the listWidget
+        populateList();             // Populate the listWidget
+        return 1;                   // Repo Switched
+    }else{
+        if (!silent)
+            QMessageBox::information(nullptr/*or parent*/, "NOTICE",
+                QString("Nothing to update!"),
+                QMessageBox::Ok);
+        return 0;
+    }
+}
+
+
+
 BranchHandler::BranchHandler(){
     myBranchStr = "master";     // Set default branch at runtime
 
+    lastMyDirStr = myDirStr;    // Initialize Last dir string
+
     // Make Widgets
-    QPushButton *branch = new QPushButton("&Branch Repo", this);
-    QPushButton *refresh = new QPushButton("&Refresh Tab", this);
+    QPushButton *branch = new QPushButton("&Confirm Selection", this);
+    QPushButton *refresh = new QPushButton("&Update Branch List", this);
     listWidget = new QListWidget;
 
     if (repoCheck()){
@@ -93,9 +102,16 @@ BranchHandler::BranchHandler(){
 
     setLayout(formLayout);
     connect(branch, SIGNAL (released()),this, SLOT (doBranch()));
-    connect(refresh, SIGNAL (released()),this, SLOT (doRefresh(0)));
-
+    connect(refresh, SIGNAL (released()),this, SLOT (doRefreshBtn()));
 }
+
+
+
+
+void BranchHandler::doRefreshBtn(){
+    doRefresh(0);
+}
+
 
 
 
@@ -103,15 +119,15 @@ void BranchHandler::doBranch(){
     if (repoCheck()){
         if (doRefresh(1)) { // If repo has not been switched
             QMessageBox::information(nullptr/*or parent*/, "NOTICE",
-                QString("Repo is refreshing!"),
+                QString("Repository change detected!\n\nThe branch list will now be updated. Please make a selection from the list of new branches before proceeding."),
                 QMessageBox::Ok);
         }else{
-            GITPP::REPO r(myDirStr);                // connect to repo
+            GITPP::REPO r(myDirStr);                        // connect to repo
 
             int selectedBranch = listWidget->currentRow();  // Get index of selected branch from "listWidget"
-            int branchCounter = -1;                 // Reset branchCounter
+            int branchCounter = -1;                         // Reset branchCounter
 
-            for(GITPP::BRANCH i : r.branches()){    // Loop till chosen branch found
+            for(GITPP::BRANCH i : r.branches()){            // Loop till chosen branch found
                 branchCounter+=1;
                 if (selectedBranch == branchCounter){
 
@@ -121,13 +137,14 @@ void BranchHandler::doBranch(){
                             QMessageBox::warning(nullptr/*or parent*/, "WARNING",
                                 QString("Cannot checkout. This operation is not allowed against bare repositories.\nPlease change modes and try again."),
                                 QMessageBox::Ok);
+
                     }else{
 
                         // Error check required as conflicts can prevent checkout of branches
                         try{
                             myBranchStr = i.name();
-                            r.checkout(myBranchStr);           // Switch to branch
-                           // listCommit(0);                // Now list commits in this branch
+                            r.checkout(myBranchStr);            // Switch to branch
+                           // listCommit(0);                    // Now list commits in this branch
 
                             std::string str = i.name();
                             const char * c = str.c_str();
