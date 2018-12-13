@@ -25,6 +25,7 @@ class StatsHandler: public QWidget {
 
 public:
 	StatsHandler();
+	void            repoInit();
 
 private slots:
 	void            summary();
@@ -35,10 +36,9 @@ private: // widgets needed
 	QLabel*			_label;
 	QWidget*		_mainWidget;
 	QTableWidget*	gitList;
+	std::string 	currentDir;
 	void            prepareGitList();
 	void            prepareGitListTotals();
-	void            repoInit();
-	int 			repoCheck();
 	void            loadData();
 	bool            m_skip_list;    // avoid updates to the list
     // std::map to store the totals by author

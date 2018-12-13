@@ -136,6 +136,7 @@ StatsHandler::StatsHandler()
     buttonsLayout->addWidget(summary_pushButton);
     buttonsLayout->addWidget(totals_pushButton);
     saveButtonsLayout->addWidget(save_pushButton);
+
     buttonsLayout->setAlignment(Qt::AlignRight);
     saveButtonsLayout->setAlignment(Qt::AlignRight);
     verticalLayout->addLayout(buttonsLayout);
@@ -143,41 +144,35 @@ StatsHandler::StatsHandler()
     verticalLayout->addLayout(saveButtonsLayout);
     centralLayout->addLayout(verticalLayout);
     setLayout(centralLayout);
+    myDirStr = ".";
+    currentDir =  myDirStr;
     repoInit();
+    summary ();
 }
-
-int StatsHandler::repoCheck(){ // Checks to see if valid repo path entered
-    try{
-        GITPP::REPO r(myDirStr);
-        return(1);
-    }catch(const std::exception& e){
-        return(0); // No repo loaded
-    }
-}
-
 
 // Initialize the std::map with the authors names
 void StatsHandler::repoInit ()
 {
-    if (repoCheck()){
-        GITPP::REPO repository(myDirStr);
-        m_commits.erase (m_commits.begin (), m_commits.end ());
-        for(auto i : repository.branches())
+    std::string path=myDirStr;
+    GITPP::REPO repository(path.c_str());
+    m_commits.erase (m_commits.begin (), m_commits.end ());
+    for(auto i : repository.branches())
+    {
+        repository.checkout(i.name());
+        for(auto i : repository.commits())
         {
-            repository.checkout(i.name());
-            for(auto i : repository.commits())
-            {
-                m_commits[i.author()].ids.push_back (i.id());
-            }
+            m_commits[i.author()].ids.push_back (i.id());
         }
-        summary ();
-        
     }
 }
 
 // Load and display the summary listing
 void StatsHandler::summary ()
 {
+    if (currentDir != myDirStr) {
+	repoInit ();
+    	currentDir =  myDirStr;
+    } 
     // set the sorting method to the fields in the listing
     QHeaderView* head = gitList->horizontalHeader();
     head->setSortIndicator(-1, Qt::AscendingOrder);
@@ -292,13 +287,13 @@ void StatsHandler::loadData ()
     // set options (not all used)
     struct opts o = {
         GIT_DIFF_OPTIONS_INIT, GIT_DIFF_FIND_OPTIONS_INIT,
-        -1, 0, 0, GIT_DIFF_FORMAT_PATCH, NULL, NULL, "."
+        -1, 0, 0, GIT_DIFF_FORMAT_PATCH, NULL, NULL, myDirStr.c_str ()
     };
 
     // initialize the library
     git_libgit2_init();
     // open the repository
-    check_lg2(git_repository_open(&repo, o.dir), "Could not open repository", o.dir);
+    check_lg2(git_repository_open(&repo, o.dir), "Could not open repository", myDirStr.c_str ());
     // initialize variables
     total_insertions = 0;
     total_deletions = 0;
@@ -412,6 +407,12 @@ void StatsHandler::loadData ()
 // display the totals listing
 void StatsHandler::totals ()
 {
+    if (currentDir != myDirStr) {
+	repoInit ();
+	summary ();
+    	currentDir =  myDirStr;
+    } 
+    // set the sorting method to the fields in the listing
     // clear the list
     m_skip_list = true;
     while (gitList->rowCount() > 0) {
