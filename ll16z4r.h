@@ -38,6 +38,7 @@ private: // widgets needed
 	void            prepareGitList();
 	void            prepareGitListTotals();
 	void            repoInit();
+	int 			repoCheck();
 	void            loadData();
 	bool            m_skip_list;    // avoid updates to the list
     // std::map to store the totals by author
