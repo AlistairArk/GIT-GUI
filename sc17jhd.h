@@ -18,6 +18,7 @@ class BranchHandler : public QWidget{
         int repoCheck();
         void doBranch();
         int doRefresh(bool);
+        void doRefreshBtn();
         void populateList();
     private:
         QListWidget *listWidget;
