@@ -45,7 +45,7 @@ displayCommit::displayCommit(){
 			GITPP::REPO r(myDirStr);
 			label2->setVisible(true);
 			auto c=r.config();
-			if(c["core.bare"].value()=="true")
+			if(c["core.bare"].value()=="false")
 			{
 				r.checkout(myBranchStr);
 				QString b = QString::fromStdString(myBranchStr);
